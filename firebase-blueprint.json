@@ -1,0 +1,206 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile settings including birth date and target lifespan horizon",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "User display name",
+          "maxLength": 100
+        },
+        "birthDate": {
+          "type": "string",
+          "description": "Date of birth in YYYY-MM-DD format",
+          "maxLength": 20
+        },
+        "targetLifespanYears": {
+          "type": "number",
+          "description": "Expected target lifespan in years"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 150
+        },
+        "userId": {
+          "type": "string",
+          "description": "Auth UID of the owner",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when updated"
+        }
+      },
+      "required": ["userId", "birthDate", "targetLifespanYears"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "A user's personal goal with deadline and milestones",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Goal title",
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "description": "Goal description",
+          "maxLength": 1000
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of goal",
+          "maxLength": 60
+        },
+        "priority": {
+          "type": "string",
+          "description": "Priority level",
+          "enum": ["high", "medium", "low"]
+        },
+        "startDate": {
+          "type": "string",
+          "description": "ISO start date",
+          "maxLength": 50
+        },
+        "targetDate": {
+          "type": "string",
+          "description": "ISO deadline target date",
+          "maxLength": 50
+        },
+        "isCompleted": {
+          "type": "boolean",
+          "description": "Whether goal is completed"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "ISO completion date or null",
+          "maxLength": 50
+        },
+        "isPinned": {
+          "type": "boolean",
+          "description": "Whether goal is pinned on dashboard"
+        },
+        "milestones": {
+          "type": "array",
+          "description": "Sub-milestones for goal"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Personal reflection notes",
+          "maxLength": 500
+        },
+        "userId": {
+          "type": "string",
+          "description": "Auth UID of the user who owns this goal",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["title", "category", "targetDate", "isCompleted", "userId"]
+    },
+    "ParentProfile": {
+      "title": "ParentProfile",
+      "description": "Parent or loved one profile for tracking remaining time and visits",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Parent's name",
+          "maxLength": 100
+        },
+        "relationship": {
+          "type": "string",
+          "description": "Relationship type",
+          "maxLength": 50
+        },
+        "birthDate": {
+          "type": "string",
+          "description": "Date of birth in YYYY-MM-DD format",
+          "maxLength": 20
+        },
+        "lifeExpectancyYears": {
+          "type": "number",
+          "description": "Estimated life expectancy in years"
+        },
+        "visitsPerYear": {
+          "type": "number",
+          "description": "Number of in-person visits per year"
+        },
+        "avgDaysPerVisit": {
+          "type": "number",
+          "description": "Average duration of each visit in days"
+        },
+        "callsPerMonth": {
+          "type": "number",
+          "description": "Number of phone calls per month"
+        },
+        "nextScheduledVisit": {
+          "type": "string",
+          "description": "ISO timestamp for next scheduled visit or null",
+          "maxLength": 50
+        },
+        "nextScheduledCall": {
+          "type": "string",
+          "description": "ISO timestamp for next scheduled call or null",
+          "maxLength": 50
+        },
+        "location": {
+          "type": "string",
+          "description": "Location description",
+          "maxLength": 150
+        },
+        "cherishMoments": {
+          "type": "array",
+          "description": "Bucket list moments and questions"
+        },
+        "visitLogs": {
+          "type": "array",
+          "description": "Historical logged visits and calls"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Auth UID of the user who owns this parent profile",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["name", "relationship", "birthDate", "lifeExpectancyYears", "userId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile settings including life horizon and birth date"
+    },
+    "/users/{userId}/goals/{goalId}": {
+      "schema": "Goal",
+      "description": "User's personal goals and live deadline countdowns"
+    },
+    "/users/{userId}/parents/{parentId}": {
+      "schema": "ParentProfile",
+      "description": "User's parents or loved ones profiles, tail end metrics, and cherish moments"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Kairos - Time, Goals & Parents Countdown",
+  "description": "Keep track of personal goals with live countdowns, visualize your life calendar, and cherish precious remaining time and visits with parents.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // User Profile Rules
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && isValidId(userId)
+        && incoming().userId == userId
+        && incoming().name is string && incoming().name.size() <= 100
+        && incoming().birthDate is string && incoming().birthDate.size() <= 20
+        && incoming().targetLifespanYears is number;
+      allow update: if isOwner(userId)
+        && incoming().userId == existing().userId
+        && incoming().name is string && incoming().name.size() <= 100
+        && incoming().birthDate is string && incoming().birthDate.size() <= 20
+        && incoming().targetLifespanYears is number;
+      allow delete: if isOwner(userId);
+
+      // Goals Subcollection
+      match /goals/{goalId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && isValidId(goalId)
+          && incoming().userId == userId
+          && incoming().title is string && incoming().title.size() > 0 && incoming().title.size() <= 200
+          && incoming().category is string && incoming().category.size() <= 60
+          && incoming().targetDate is string && incoming().targetDate.size() <= 50
+          && incoming().isCompleted is bool;
+        allow update: if isOwner(userId)
+          && incoming().userId == existing().userId
+          && incoming().title is string && incoming().title.size() > 0 && incoming().title.size() <= 200
+          && incoming().category is string && incoming().category.size() <= 60
+          && incoming().targetDate is string && incoming().targetDate.size() <= 50
+          && incoming().isCompleted is bool;
+        allow delete: if isOwner(userId);
+      }
+
+      // Parents Subcollection
+      match /parents/{parentId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && isValidId(parentId)
+          && incoming().userId == userId
+          && incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100
+          && incoming().relationship is string && incoming().relationship.size() <= 50
+          && incoming().birthDate is string && incoming().birthDate.size() <= 20
+          && incoming().lifeExpectancyYears is number;
+        allow update: if isOwner(userId)
+          && incoming().userId == existing().userId
+          && incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100
+          && incoming().relationship is string && incoming().relationship.size() <= 50
+          && incoming().birthDate is string && incoming().birthDate.size() <= 20
+          && incoming().lifeExpectancyYears is number;
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}
